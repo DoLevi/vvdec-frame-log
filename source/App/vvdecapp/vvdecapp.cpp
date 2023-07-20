@@ -40,6 +40,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 ------------------------------------------------------------------------------------------- */
 
+#include <sys/time.h>
 #include <iostream>
 #include <stdio.h>
 #include <fstream>
@@ -606,8 +607,11 @@ int main( int argc, char* argv[] )
     bool bMultipleSlices = false;
 
     int iRead = 0;
+    struct timeval ts_log;
     do
     {
+      gettimeofday(&ts_log, NULL);
+      printf("decoding %d: %luus\n", uiFrames, ts_log.tv_sec * 1000000 + ts_log.tv_usec);
       iRead = readBitstreamFromFile( &cInFile, accessUnit, false );
       //if( iRead > 0 )
       {
@@ -815,6 +819,8 @@ int main( int argc, char* argv[] )
             if ( externAllocator ) unrefFrame( pcFrame );             
             vvdec_frame_unref( dec, pcFrame );
           }
+          gettimeofday(&ts_log, NULL);
+          printf("decoded %d: %luus\n", uiFrames - 1, ts_log.tv_sec * 1000000 + ts_log.tv_usec);
         }
 
         if( uiFrames && params.logLevel >= VVDEC_INFO )
